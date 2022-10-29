@@ -3,8 +3,9 @@ package jade;
 
 import components.SpriteRender;
 import org.joml.Vector2f;
-import org.joml.Vector4f;
-import render.Renderer;
+import util.AssetPool;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 public class LevelEditorScene extends Scene{
 
@@ -18,33 +19,37 @@ public class LevelEditorScene extends Scene{
     @Override
     public  void init(){
 //        this.renderer = new Renderer();
-        this.camera = new Camera(new Vector2f());
+        this.camera = new Camera(new Vector2f(-250,0));
 
+        GameOject obj1 = new GameOject("Obj1", new Transform(new Vector2f(100,100), new Vector2f(256,256)));
+        obj1.addComponent(new SpriteRender(AssetPool.getTexture("assets/images/testImage.png")));
+        this.addGameOjectToScene(obj1);
 
-        int xOffset = 10;
-        int yOffset = 10;
+        GameOject obj2 = new GameOject("Obj2", new Transform(new Vector2f(400,400), new Vector2f(256,256)));
+        obj2.addComponent(new SpriteRender(AssetPool.getTexture("assets/images/testImage2.png")));
+        this.addGameOjectToScene(obj2);
 
-        float totalWidth = (float)(600- xOffset * 2);
-        float totalHeight = (float) (300 - yOffset *2);
-
-        float xSize = totalWidth /100.0f;
-        float ySize = totalHeight/100.0f;
-
-        for (int x=0; x<100; x++){
-            for (int y=0; y<100; y++){
-                float xPos = xOffset + (x * xSize);
-                float yPos = yOffset + (y * ySize);
-
-                GameOject game = new GameOject("Obj" + x +" " + y,new Transform(new Vector2f(xPos,yPos),new Vector2f(xSize,ySize)));
-                game.addComponent(new SpriteRender(new Vector4f(xPos/ totalWidth,yPos/totalHeight,1,1)));
-                this.addGameOjectToScene(game);
-            }
-        }
+        loadResources();
 
     }
 
+    private void loadResources(){
+        AssetPool.getShader("assets/shaders/default.glsl");
+    }
     @Override
     public void update(float dt) {
+
+        if (KeyListener.isKeyPressed(GLFW_KEY_RIGHT)){
+            camera.position.x -=100f *dt;
+        }else if(KeyListener.isKeyPressed(GLFW_KEY_LEFT)){
+            camera.position.x +=100f *dt;
+        }
+
+        if (KeyListener.isKeyPressed(GLFW_KEY_UP)){
+            camera.position.y -= 100f *dt;
+        }else if(KeyListener.isKeyPressed(GLFW_KEY_DOWN)){
+            camera.position.y += 100f *dt;
+        }
 
         for (GameOject go: this.gameOjects){
             go.update(dt);
